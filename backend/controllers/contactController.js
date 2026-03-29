@@ -31,18 +31,22 @@ const submitContact = async (req, res) => {
       try {
         console.log("Configuring email transporter for:", process.env.EMAIL_USER);
         const transporter = nodemailer.createTransport({
-          service: 'gmail', // Simplify for Gmail
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false, // Must be false for port 587
+          requireTLS: true,
           auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS
           },
           tls: {
             // Do not fail on invalid certificates (common on shared cloud systems)
-            rejectUnauthorized: false
+            rejectUnauthorized: false,
+            minVersion: 'TLSv1.2'
           },
-          connectionTimeout: 15000, 
-          socketTimeout: 15000,
-          logger: true, // Output logs to console
+          connectionTimeout: 30000, // Increase to 30s
+          socketTimeout: 30000,
+          logger: true, // Output logs to console for render
           debug: true   // Include debug info
         });
 
