@@ -39,7 +39,7 @@ const Experience = () => {
   const isAdmin = typeof window !== 'undefined' ? !!localStorage.getItem('adminToken') : false;
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/experience')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/experience`)
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
@@ -69,7 +69,7 @@ const Experience = () => {
     setTimelineData(prev => [...prev, finalItem]);
 
     try {
-      const response = await fetch('http://localhost:5000/api/experience', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/experience`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ const Experience = () => {
     if (!confirm('Are you sure you want to delete this item?')) return;
     setTimelineData(prev => prev.filter(item => item.id !== id));
     try {
-      await fetch(`http://localhost:5000/api/experience/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/experience/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });

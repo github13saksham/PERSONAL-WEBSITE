@@ -44,7 +44,7 @@ const Projects = () => {
   const isAdmin = typeof window !== 'undefined' ? !!localStorage.getItem('adminToken') : false;
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/projects')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/projects`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -60,7 +60,7 @@ const Projects = () => {
   const handleSave = async () => {
     if (!newItem.name || !newItem.html_url) return;
     try {
-      const response = await fetch('http://localhost:5000/api/projects', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ const Projects = () => {
     if (!confirm('Are you sure you want to delete this project?')) return;
     setProjects(prev => prev.filter(p => p.id !== id));
     try {
-      await fetch(`http://localhost:5000/api/projects/${id}`, {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/projects/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
