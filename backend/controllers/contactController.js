@@ -16,11 +16,9 @@ const submitContact = async (req, res) => {
       data: { name, email, message }
     });
 
-    // Send response to user IMMEDIATELY so UI doesn't hang
-    res.status(200).json({ success: true, message: 'Message sent successfully!' });
-
-    // Handle email in the background
+    // Handle email
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      try {
         const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 465,
@@ -29,9 +27,12 @@ const submitContact = async (req, res) => {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS
           },
-          connectionTimeout: 10000, // 10s timeout
-          socketTimeout: 10000
+          connectionTimeout: 15000, 
+          socketTimeout: 15000
         });
+
+        // Verify connection before sending
+        await transporter.verify();
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
@@ -48,9 +49,27 @@ const submitContact = async (req, res) => {
             text: `Hi ${name},\n\nThank you for contacting me! I have received your message and will get back to you as soon as possible.\n\nHere is a copy of your message:\n"${message}"\n\nBest regards,\nSaksham Makhija`
         };
 
-        // Fire and forget (with logging)
-        transporter.sendMail(mailOptions).catch(err => console.error("Admin Email Error:", err));
-        transporter.sendMail(autoReplyOptions).catch(err => console.error("User Auto-Reply Error:", err));
+        // Send both mails
+        await Promise.all([
+          transporter.sendMail(mailOptions),
+          transporter.sendMail(autoReplyOptions)
+        ]);
+
+        console.log("Emails sent successfully for contact request from:", name);
+        return res.status(200).json({ success: true, message: 'Message sent successfully!' });
+
+      } catch (emailError) {
+        console.error("Email Sending Error:", emailError);
+        // We still saved it to the DB, but email failed
+        return res.status(500).json({ 
+          success: false, 
+          message: 'Message saved, but email notification failed. I will check it soon.',
+          error: emailError.message 
+        });
+      }
+    } else {
+      console.warn("SMTP credentials missing, only saving to database.");
+      return res.status(200).json({ success: true, message: 'Message received (Email notification skipped)' });
     }
   } catch (error) {
     console.error('Contact database error:', error);
