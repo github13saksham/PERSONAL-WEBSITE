@@ -8,6 +8,7 @@ import Projects from './sections/Projects';
 import Experience from './sections/Experience';
 import Certificates from './sections/Certificates';
 import Contact from './sections/Contact';
+import AdminLogin from './components/AdminLogin';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,7 @@ function App() {
         <Contact />
       </main>
       <Footer />
+      <AdminLogin />
     </div>
   );
 }

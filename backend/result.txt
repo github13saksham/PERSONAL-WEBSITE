@@ -1,0 +1,78 @@
+Saksham Makhija  
+ 
+            www.linkedin.com/in/saksham-makhija-5745b3305 |  smakhija140@gmail.com |   8700981424  
+ 
+    
+   Motivated Full Stack Developer (Fresher) skilled in crafting dynamic UIs with React & Tailwind CSS and building robust APIs u sing 
+Node.js, Express, and MongoDB. Experienced in implementing responsive design, authentication flows, database schemas, and  
+modern development best practices. Eager to contribute to impactful projects and grow in a fast -paced engineering environment. 
+                                                                                                              
+ 
+B. Tech (Computer Science Engineering), Sharda University                           2022–2026 
+AISSE (Class XII), CBSE – Manav Sthali School                        2021-2022 
+AISSE (Class X), CBSE – Manav Sthali School         2019-2020                                                               
+ 
+ 
+Emotion Detection Using CNN –                                                                                                                                                                     Dec 2023 
+Built a Convolutional Neural Network (CNN) to classify emotions from facial images.  
+Implemented data preprocessing, training/validation/test splitting, and performance evaluation.  
+Technologies: Python, TensorFlow/Keras, OpenCV. 
+ 
+Facial Recognition System                                                                                                                                                                                Feb 2024 
+    Designed and trained a recognition model integrating machine learning, deep learning,  And database management. 
+    Developed a face recognition model integrating machine learning and deep learning  algorithms.  
+    Implemented database management for storing face embeddings and designed a simple UI for interaction.  
+ Technologies: Python, OpenCV, MySQL, Tkinter. 
+ 
+Unibro Platform (Group Project)                                                                                                                                                                   Nov 2024 
+Created a university networking platform to help new students explore institutions, connect with faculty,  
+and chat with peers. Focused on user interface, chat module, and role -based access features. 
+Technologies: React.js, Node.js, MongoDB, Socket.io. 
+ 
+Parivar Pehchan Patra Website (Internship Project)                                                                                                                                  May 2025 
+Designed and developed the login page and family dashboard for a Govt. portal.  
+Used React.js, TailwindCSS, and inext18ts for multilingual UI support.  
+Collaborated with backend team for API integration and improved accessibility.  
+ 
+Leveraging Ai for Precise Cost Estimation (Published)-                                                                                                                               Present                                                            
+Developed an AI-powered model to predict and estimate project costs with higher accuracy compared to traditional  
+methods. Applied machine learning algorithms (e.g., regression, decision trees, ensemble models) to historical cost  
+datasets for feature extraction and prediction. Used data preprocessing, normalization, and outlier detection to improve 
+model reliability. Integrated predictive analytics dashboards for visualization of estimated vs. actual costs.   
+   Technologies: Python, Pandas, Scikit-learn, Matplotlib, Jupyter Notebook. Outcome: Achieved a significant improvement  
+   in accuracy of cost predictions, enabling smarter decision-making for budget planning and resource allocation. 
+ 
+Frontend Developer Intern – Primus Partners Solution Pvt Ltd                                                                      May 2025 – July 2025 
+• Built Parivar Pehchan Patra Govt. website login page & family dashboard using React.js, TailwindCSS,  
+and inext18ts translation tool. 
+• Collaborated with backend teams for API integration & UI consistency.  
+• Strengthened debugging and independent problem-solving skills. 
+ 
+ 
+ 
+ 
+ 
+ 
+• Languages: Python, C , JavaScript, SQL, PHP 
+• Frameworks & Tools: React.js, Node.js, Express.js, Tailwind Css, CSS, Git/GitHub, VS Code, Restful API  
+• Databases: PostgreSQL, MongoDB, MySQL 
+• Soft Skills: Analytical Thinking, Team Collaboration, Ownership, Communication  
+ 
+ 
+• AWS – Amazon Web Services (30 hrs) 
+• Web Development Bootcamp 
+• SQL Oracle Course 
+• Java Oracle Course 
+• Python Bootcamp (Udemy) 
+• Node.js (npm, tools) 
+ 
+• Strong analytical and problem-solving skills 
+• Excellent team collaboration and independent ownership 
+• Efficient debugging and attention to code quality 
+• Ability to adapt quickly to new technologies 
+ 
+ CERTIFICATIONS 
+  
+ SKILLS  
+ KEY STRENGTHS 
+  

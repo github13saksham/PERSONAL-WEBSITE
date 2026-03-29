@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BriefcaseIcon, GraduationCapIcon, PlusIcon, XIcon } from 'lucide-react';
+import { BriefcaseIcon, GraduationCapIcon, PlusIcon, XIcon, Trash2Icon } from 'lucide-react';
 
 export type ExperienceType = 'job' | 'education';
 
@@ -36,6 +36,7 @@ const Experience = () => {
   const [timelineData, setTimelineData] = useState<TimelineItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [newItem, setNewItem] = useState<Partial<TimelineItem>>({ type: 'job' });
+  const isAdmin = typeof window !== 'undefined' ? !!localStorage.getItem('adminToken') : false;
 
   useEffect(() => {
     fetch('http://localhost:5000/api/experience')
@@ -72,6 +73,7 @@ const Experience = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify(finalItem),
       });
@@ -86,6 +88,19 @@ const Experience = () => {
 
     setShowModal(false);
     setNewItem({ type: 'job' }); // reset
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    setTimelineData(prev => prev.filter(item => item.id !== id));
+    try {
+      await fetch(`http://localhost:5000/api/experience/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+      });
+    } catch (err) {
+      console.error('Error deleting experience:', err);
+    }
   };
 
   return (
@@ -107,16 +122,18 @@ const Experience = () => {
             A timeline of my professional setup ranging from backend systems to frontline internships.
           </p>
           
-          <button 
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-main/20 text-primary-light border border-primary-main/30 hover:bg-primary-main hover:text-white transition-all duration-300 font-bold tracking-wide"
-          >
-            <PlusIcon size={18} /> Add New Experience
-          </button>
+          {isAdmin && (
+            <button 
+              onClick={() => setShowModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-main/20 text-primary-light border border-primary-main/30 hover:bg-primary-main hover:text-white transition-all duration-300 font-bold tracking-wide"
+            >
+              <PlusIcon size={18} /> Add New Experience
+            </button>
+          )}
         </motion.div>
 
-        <div className="relative pl-8 md:pl-0">
-          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary-main via-blue-500 to-transparent transform md:-translate-x-1/2"></div>
+        <div className="relative">
+          <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary-main via-blue-500 to-transparent transform -translate-x-1/2"></div>
           
           {timelineData.map((item, index) => {
             const isLeft = index % 2 === 0;
@@ -144,24 +161,35 @@ const Experience = () => {
                 whileHover={{ scale: 1.05 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                className={`relative mb-16 md:w-1/2 cursor-pointer group ${isLeft ? 'md:pr-12 md:text-right' : 'md:ml-auto md:pl-12'}`}
+                className={`relative mb-8 md:mb-16 w-1/2 cursor-pointer group flex ${isLeft ? 'pr-4 md:pr-12 justify-end' : 'ml-auto pl-4 md:pl-12 justify-start'}`}
               >
                 {/* Timeline icon node */}
-                <div className={`absolute left-0 w-[40px] h-[40px] top-1 bg-[#151515] border-2 transition-colors duration-500 rounded-full flex justify-center items-center transform -translate-x-[20px] z-10 shadow-lg ${isLeft ? 'md:left-auto md:-right-[20px] md:translate-x-0' : ''} ${iconColorClasses}`}>
-                    <Icon size={18} className="text-white group-hover:scale-110 transition-transform" />
+                <div className={`absolute top-0 md:top-1 w-[26px] h-[26px] md:w-[40px] md:h-[40px] bg-[#151515] border-2 transition-colors duration-500 rounded-full flex justify-center items-center z-10 shadow-lg ${isLeft ? 'right-0 translate-x-1/2' : 'left-0 -translate-x-1/2'} ${iconColorClasses}`}>
+                    <Icon className="text-white group-hover:scale-110 transition-transform w-[12px] h-[12px] md:w-[18px] md:h-[18px]" />
                 </div>
                 
-                <div className={`glass p-8 rounded-2xl border hover:bg-white/5 transition-all duration-300 ml-4 md:ml-0 relative overflow-hidden shadow-2xl ${borderClasses}`}>
+                <div className={`glass p-4 md:p-8 rounded-xl md:rounded-2xl border hover:bg-white/5 transition-all duration-300 relative overflow-hidden shadow-2xl w-full text-left ${isLeft ? 'text-right' : ''} ${borderClasses}`}>
                   <div className={`absolute top-0 w-32 h-32 rounded-full blur-2xl transition-all duration-500 ${isLeft ? 'right-0' : 'left-0'} ${glowClasses}`} />
-                  <div className="relative z-10">
-                      <span className={`inline-block px-3 py-1 bg-white/5 text-gray-400 text-xs font-bold tracking-widest uppercase rounded-full border border-white/10 mb-3 block w-max ${isLeft ? 'md:ml-auto' : ''}`}>
-                        {item.date}
-                      </span>
-                      <h3 className={`text-2xl font-bold text-white mb-1 transition-colors ${titleHoverClass}`}>
+                    <div className="relative z-10">
+                      <div className={`flex items-start mb-2 md:mb-3 ${isLeft ? 'justify-end md:justify-between' : 'justify-between'} ${isLeft ? 'flex-row-reverse md:flex-row' : ''}`}>
+                        <span className={`inline-block px-1.5 py-0.5 md:px-3 md:py-1 bg-white/5 text-gray-400 text-[8px] md:text-xs font-bold tracking-widest uppercase rounded-full border border-white/10 w-max`}>
+                          {item.date}
+                        </span>
+                        {isAdmin && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                            className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/30 hover:text-red-300 transition-all opacity-0 group-hover:opacity-100"
+                            title="Delete"
+                          >
+                            <Trash2Icon size={14} />
+                          </button>
+                        )}
+                      </div>
+                      <h3 className={`text-[15px] md:text-2xl font-bold text-white mb-1 transition-colors leading-tight ${titleHoverClass}`}>
                         {item.title}
                       </h3>
-                      <h4 className="text-gray-400 font-medium mb-4 tracking-wide">{item.subtitle}</h4>
-                      <p className="text-gray-300 leading-relaxed text-sm md:text-base">
+                      <h4 className="text-[11px] md:text-base text-gray-400 font-medium mb-2 md:mb-4 tracking-wide">{item.subtitle}</h4>
+                      <p className="text-gray-300 leading-snug md:leading-relaxed text-[10px] md:text-base">
                         {item.description}
                       </p>
                   </div>

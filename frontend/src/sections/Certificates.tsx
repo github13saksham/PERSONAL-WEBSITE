@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AwardIcon, ExternalLinkIcon, PlusIcon, XIcon } from 'lucide-react';
+import { AwardIcon, ExternalLinkIcon, PlusIcon, XIcon, Trash2Icon } from 'lucide-react';
 
 export interface CertificateItem {
   id: string;
@@ -17,6 +17,7 @@ const Certificates = () => {
   const [certificates, setCertificates] = useState<CertificateItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [newItem, setNewItem] = useState<Partial<CertificateItem>>({});
+  const isAdmin = typeof window !== 'undefined' ? !!localStorage.getItem('adminToken') : false;
 
   useEffect(() => {
     fetch('http://localhost:5000/api/certificates')
@@ -52,6 +53,7 @@ const Certificates = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify(finalItem),
       });
@@ -65,6 +67,19 @@ const Certificates = () => {
 
     setShowModal(false);
     setNewItem({});
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this certificate?')) return;
+    setCertificates(prev => prev.filter(item => item.id !== id));
+    try {
+      await fetch(`http://localhost:5000/api/certificates/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+      });
+    } catch (err) {
+      console.error('Error deleting certificate:', err);
+    }
   };
 
   return (
@@ -85,12 +100,14 @@ const Certificates = () => {
             A showcase of my verified skills and official credentials.
           </p>
           
-          <button 
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-purple-600/20 text-purple-400 border border-purple-500/30 hover:bg-purple-600 hover:text-white transition-all duration-300 font-bold tracking-wide"
-          >
-            <PlusIcon size={18} /> Add New Certificate
-          </button>
+          {isAdmin && (
+            <button 
+              onClick={() => setShowModal(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-purple-600/20 text-purple-400 border border-purple-500/30 hover:bg-purple-600 hover:text-white transition-all duration-300 font-bold tracking-wide"
+            >
+              <PlusIcon size={18} /> Add New Certificate
+            </button>
+          )}
         </motion.div>
 
         {certificates.length === 0 ? (
@@ -107,7 +124,7 @@ const Certificates = () => {
                 whileHover={{ y: -5 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
-                className="glass p-8 rounded-2xl border border-white/5 hover:border-purple-500/50 hover:bg-white/5 transition-all duration-300 relative overflow-hidden group shadow-2xl flex flex-col h-full"
+                className="glass p-6 md:p-8 rounded-2xl border border-white/5 hover:border-purple-500/50 hover:bg-white/5 transition-all duration-300 relative overflow-hidden group shadow-2xl flex flex-col h-full"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all duration-500" />
                 
@@ -116,15 +133,26 @@ const Certificates = () => {
                     <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20 text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
                       <AwardIcon size={24} />
                     </div>
-                    <span className="inline-block px-3 py-1 bg-white/5 text-gray-400 text-xs font-bold tracking-widest uppercase rounded-full border border-white/10">
-                      {item.date}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block px-2.5 py-1 md:px-3 md:py-1 bg-white/5 text-gray-400 text-[10px] md:text-xs font-bold tracking-widest uppercase rounded-full border border-white/10">
+                        {item.date}
+                      </span>
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/30 hover:text-red-300 transition-all opacity-0 group-hover:opacity-100"
+                          title="Delete"
+                        >
+                          <Trash2Icon size={14} />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   
-                  <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-1 md:mb-2 group-hover:text-purple-400 transition-colors">
                     {item.title}
                   </h3>
-                  <h4 className="text-gray-400 font-medium mb-4">{item.issuer}</h4>
+                  <h4 className="text-sm md:text-base text-gray-400 font-medium mb-3 md:mb-4">{item.issuer}</h4>
                   
                   <p className="text-gray-300 leading-relaxed text-sm flex-grow mb-6">
                     {item.description}

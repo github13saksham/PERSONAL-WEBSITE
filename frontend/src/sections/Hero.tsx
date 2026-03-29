@@ -77,7 +77,7 @@ const Hero = () => {
       </div>
 
       {/* 2. FOREGROUND NAME LAYER — Positioned on sides of subject (z-50) */}
-      <div className="absolute inset-x-0 top-[40%] md:top-[35%] -translate-y-1/2 flex justify-between items-center px-[2vw] md:px-[33vw] pointer-events-none select-none z-50">
+      <div className="absolute inset-x-0 top-[40%] lg:top-[35%] -translate-y-1/2 hidden lg:flex justify-between items-center px-[2vw] lg:px-[33vw] pointer-events-none select-none z-50">
         <motion.h1 
           initial={{ opacity: 0, x: -60, rotate: 0 }}
           animate={{ opacity: 1, x: 0, rotate: 0 }}
@@ -99,6 +99,7 @@ const Hero = () => {
       {/* 3. IMAGE CONTAINER (z-10) */}
       <div
         ref={imgBoxRef}
+        id="hero-image-container"
         className="relative z-10 flex items-end justify-center mt-auto pointer-events-auto group"
         style={{ height: '95vh', width: '60vw', maxWidth: '750px', minWidth: '320px', cursor: 'crosshair' }}
       >
@@ -115,8 +116,8 @@ const Hero = () => {
       </div>
 
       {/* 4. BOTTOM CONTENT AREA — Absolutely positioned to overlap image (z-20) */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 w-full pt-8 pb-8 flex" style={{ background: 'linear-gradient(to bottom, transparent 0%, #0A0A0A 60%)' }}>
-        <div className="w-full max-w-7xl mx-auto px-8 flex flex-col md:flex-row items-end justify-between gap-12">
+      <div className="absolute bottom-0 left-0 right-0 z-20 w-full pt-8 pb-4 lg:pb-8 flex" style={{ background: 'linear-gradient(to bottom, transparent 0%, #0A0A0A 50%)' }}>
+        <div className="w-full max-w-7xl mx-auto px-5 lg:px-8 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-4 lg:gap-12">
           {/* Left info */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -124,19 +125,19 @@ const Hero = () => {
             className="space-y-4"
           >
             <div className="flex flex-col">
-              <span className="text-primary-light font-mono text-sm tracking-widest uppercase mb-1">Portfolio 2024</span>
-              <h1 className="text-5xl md:text-6xl font-black text-white leading-[0.9] tracking-tighter">
+              <span className="text-primary-light font-mono text-xs lg:text-sm tracking-widest uppercase mb-1 drop-shadow-md">Portfolio 2024</span>
+              <h1 className="text-4xl lg:text-6xl font-black text-white leading-[0.9] tracking-tighter drop-shadow-lg">
                 Saksham<br />Makhija
               </h1>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <a href={`https://github.com/${import.meta.env.VITE_GITHUB_USERNAME || 'github13saksham'}/`} target="_blank" rel="noreferrer" 
-                 className="p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-primary-main hover:border-primary-main transition-all duration-300">
-                <GithubIcon size={20} />
+                 className="p-2 md:p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-primary-main hover:border-primary-main transition-all duration-300">
+                <GithubIcon size={18} />
               </a>
               <a href="https://linkedin.com/in/saksham-makhija13/" target="_blank" rel="noreferrer" 
-                 className="p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-blue-600 hover:border-blue-600 transition-all duration-300">
-                <LinkedinIcon size={20} />
+                 className="p-2 md:p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-blue-600 hover:border-blue-600 transition-all duration-300">
+                <LinkedinIcon size={18} />
               </a>
             </div>
           </motion.div>
@@ -145,17 +146,17 @@ const Hero = () => {
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex flex-col items-start md:items-end gap-6 max-w-sm"
+            className="flex flex-col items-start lg:items-end gap-5 lg:gap-6 max-w-sm mb-4 lg:mb-0"
           >
-            <p className="text-gray-400 text-lg leading-relaxed text-left md:text-right">
+            <p className="text-gray-200 lg:text-gray-400 text-sm lg:text-lg leading-relaxed text-left lg:text-right drop-shadow-lg font-medium lg:font-normal">
               Architecting high-performance digital experiences through modern Full Stack engineering and creative design.
             </p>
-            <div className="flex gap-4">
-              <a href="#projects" className="px-8 py-4 rounded-full bg-primary-main text-white font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-primary-main/20">
-                Explore Projects <ArrowRightIcon size={20} />
+            <div className="flex flex-wrap gap-3 md:gap-4">
+              <a href="#projects" className="px-5 md:px-8 py-3 md:py-4 rounded-full bg-primary-main text-white font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-lg shadow-primary-main/20 text-xs md:text-base">
+                Explore Projects <ArrowRightIcon size={16} />
               </a>
-              <a href="/resume.pdf" download className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 hover:scale-105 transition-all flex items-center gap-2">
-                <DownloadIcon size={20} /> Resume
+              <a href="/resume.pdf" download className="px-5 md:px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 hover:scale-105 transition-all flex items-center gap-2 text-xs md:text-base">
+                <DownloadIcon size={16} /> Resume
               </a>
             </div>
           </motion.div>
@@ -167,6 +168,13 @@ const Hero = () => {
           0%, 100% { transform: translate(0, 0) rotate(0deg); }
           25% { transform: translate(2px, -2px) rotate(0.5deg); }
           75% { transform: translate(-2px, 2px) rotate(-0.5deg); }
+        }
+        @media (max-width: 1024px) {
+          #hero-image-container {
+            height: 100vh !important;
+            width: 100vw !important;
+            min-width: unset !important;
+          }
         }
       `}</style>
     </section>

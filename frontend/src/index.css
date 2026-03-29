@@ -9,6 +9,9 @@
     @apply bg-background text-gray-100 font-sans;
     overflow-x: hidden;
   }
+  p {
+    @apply text-justify;
+  }
 }
 
 /* Custom scrollbar */

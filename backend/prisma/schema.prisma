@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Contact {
@@ -34,4 +33,24 @@ model Certificate {
   description String
   link        String?
   createdAt   DateTime @default(now())
+}
+
+model Skill {
+  id        String   @id @default(uuid())
+  category  String
+  name      String
+  icon      String
+  color     String
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id               String   @id @default(uuid())
+  name             String
+  description      String
+  html_url         String
+  language         String
+  stargazers_count Int      @default(0)
+  forks_count      Int      @default(0)
+  createdAt        DateTime @default(now())
 }
