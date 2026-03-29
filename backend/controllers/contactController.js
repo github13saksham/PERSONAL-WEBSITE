@@ -29,20 +29,26 @@ const submitContact = async (req, res) => {
     // 2. Attempt to Send Email
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       try {
+        console.log("Configuring email transporter for:", process.env.EMAIL_USER);
         const transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false, // Use TLS (STARTTLS)
+          service: 'gmail', // Simplify for Gmail
           auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS
           },
-          connectionTimeout: 10000, 
-          socketTimeout: 10000
+          tls: {
+            // Do not fail on invalid certificates (common on shared cloud systems)
+            rejectUnauthorized: false
+          },
+          connectionTimeout: 15000, 
+          socketTimeout: 15000,
+          logger: true, // Output logs to console
+          debug: true   // Include debug info
         });
 
-        // Verify connection before sending
+        console.log("Verifying SMTP connection...");
         await transporter.verify();
+        console.log("SMTP connection verified!");
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
