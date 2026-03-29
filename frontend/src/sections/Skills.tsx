@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlusIcon, XIcon, Trash2Icon } from 'lucide-react';
+import { API_BASE } from '../config';
 
 interface Skill {
   id: string;
@@ -35,7 +36,7 @@ const Skills = () => {
   const isAdmin = typeof window !== 'undefined' ? !!localStorage.getItem('adminToken') : false;
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/skills`)
+    fetch(`${API_BASE}/skills`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setSkills(data);
@@ -46,7 +47,7 @@ const Skills = () => {
   const handleSave = async () => {
     if (!newItem.name || !newItem.category) return;
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/skills`, {
+      const response = await fetch(`${API_BASE}/skills`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ const Skills = () => {
     if (!confirm('Are you sure you want to delete this skill?')) return;
     setSkills(prev => prev.filter(s => s.id !== id));
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/skills/${id}`, {
+      await fetch(`${API_BASE}/skills/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });

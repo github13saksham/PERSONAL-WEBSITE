@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LockIcon, UnlockIcon, XIcon } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const AdminLogin = () => {
   const [showModal, setShowModal] = useState(false);
@@ -16,7 +17,7 @@ const AdminLogin = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/login`, {
+      const res = await fetch(`${API_BASE}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),

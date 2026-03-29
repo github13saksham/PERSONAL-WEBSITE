@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AwardIcon, ExternalLinkIcon, PlusIcon, XIcon, Trash2Icon } from 'lucide-react';
+import { API_BASE } from '../config';
 
 export interface CertificateItem {
   id: string;
@@ -20,7 +21,7 @@ const Certificates = () => {
   const isAdmin = typeof window !== 'undefined' ? !!localStorage.getItem('adminToken') : false;
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/certificates`)
+    fetch(`${API_BASE}/certificates`)
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
@@ -49,7 +50,7 @@ const Certificates = () => {
     setCertificates(prev => [...prev, finalItem]);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/certificates`, {
+      const response = await fetch(`${API_BASE}/certificates`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +74,7 @@ const Certificates = () => {
     if (!confirm('Are you sure you want to delete this certificate?')) return;
     setCertificates(prev => prev.filter(item => item.id !== id));
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/certificates/${id}`, {
+      await fetch(`${API_BASE}/certificates/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });

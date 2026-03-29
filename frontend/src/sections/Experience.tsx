@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BriefcaseIcon, GraduationCapIcon, PlusIcon, XIcon, Trash2Icon } from 'lucide-react';
+import { API_BASE } from '../config';
 
 export type ExperienceType = 'job' | 'education';
 
@@ -39,7 +40,7 @@ const Experience = () => {
   const isAdmin = typeof window !== 'undefined' ? !!localStorage.getItem('adminToken') : false;
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/experience`)
+    fetch(`${API_BASE}/experience`)
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
@@ -69,7 +70,7 @@ const Experience = () => {
     setTimelineData(prev => [...prev, finalItem]);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/experience`, {
+      const response = await fetch(`${API_BASE}/experience`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +95,7 @@ const Experience = () => {
     if (!confirm('Are you sure you want to delete this item?')) return;
     setTimelineData(prev => prev.filter(item => item.id !== id));
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/experience/${id}`, {
+      await fetch(`${API_BASE}/experience/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
