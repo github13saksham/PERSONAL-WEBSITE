@@ -22,13 +22,14 @@ const submitContact = async (req, res) => {
     // Handle email in the background
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
         const transporter = nodemailer.createTransport({
-          service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true, // use SSL
           auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS
           },
           connectionTimeout: 10000, // 10s timeout
-          greetingTimeout: 5000,
           socketTimeout: 10000
         });
 
