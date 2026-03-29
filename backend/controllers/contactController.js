@@ -26,77 +26,98 @@ const submitContact = async (req, res) => {
       });
     }
 
-    // 2. Attempt to Send Email
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    // 2. Handle Email Notification
+    const resendKey = process.env.RESEND_API_KEY;
+    
+    if (resendKey) {
       try {
-        console.log("Configuring email transporter for:", process.env.EMAIL_USER);
+        console.log("Using Resend API for email...");
+        const https = require('https');
+        
+        const sendResend = (emailData) => {
+          return new Promise((resolve, reject) => {
+            const body = JSON.stringify(emailData);
+            const options = {
+              hostname: 'api.resend.com',
+              path: '/emails',
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${resendKey}`,
+                'Content-Type': 'application/json',
+                'Content-Length': body.length
+              }
+            };
+            const req = https.request(options, (res) => {
+              let resBody = '';
+              res.on('data', (d) => resBody += d);
+              res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) resolve(JSON.parse(resBody));
+                else reject(new Error(`Resend Error: ${res.statusCode} ${resBody}`));
+              });
+            });
+            req.on('error', reject);
+            req.write(body);
+            req.end();
+          });
+        };
+
+        // Send notification to admin
+        await sendResend({
+          from: 'Portfolio Contact <onboarding@resend.dev>',
+          to: process.env.RECEIVER_EMAIL || 'smakhija140@gmail.com',
+          subject: `New Contact Request from ${name}`,
+          text: `From: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+          reply_to: email,
+        });
+
+        // Send auto-reply to user (ignore errors for auto-reply as it requires domain verification)
+        sendResend({
+          from: 'Saksham Makhija <onboarding@resend.dev>',
+          to: email,
+          subject: `Thank you for reaching out, ${name}!`,
+          text: `Hi ${name},\n\nThank you for contacting me! I have received your message and will get back to you as soon as possible.\n\nBest regards,\nSaksham Makhija`
+        }).catch(err => console.warn("Auto-reply skipped (likely domain not verified in Resend):", err.message));
+
+        console.log("Resend API emails processed.");
+        return res.status(200).json({ success: true, message: 'Message sent successfully!' });
+
+      } catch (resendError) {
+        console.error("Resend API Error:", resendError);
+        return res.status(500).json({ success: false, message: 'Email service failed via API.', error: resendError.message });
+      }
+    } 
+    // Fallback to SMTP if no Resend Key
+    else if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      try {
+        console.log("Falling back to SMTP (Warning: Ports might be blocked on cloud)...");
         const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
           port: 587,
-          secure: false, // Must be false for port 587
+          secure: false,
           requireTLS: true,
-          auth: {
-              user: process.env.EMAIL_USER,
-              pass: process.env.EMAIL_PASS
-          },
-          tls: {
-            // Do not fail on invalid certificates (common on shared cloud systems)
-            rejectUnauthorized: false,
-            minVersion: 'TLSv1.2'
-          },
-          connectionTimeout: 30000, // Increase to 30s
-          socketTimeout: 30000,
-          logger: true, // Output logs to console for render
-          debug: true   // Include debug info
+          auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+          tls: { rejectUnauthorized: false }
         });
 
-        console.log("Verifying SMTP connection...");
         await transporter.verify();
-        console.log("SMTP connection verified!");
-
-        const mailOptions = {
+        await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: process.env.RECEIVER_EMAIL || 'smakhija140@gmail.com',
             subject: `New Contact Request from ${name}`,
             text: `From: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
             replyTo: email
-        };
-
-        const autoReplyOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: `Thank you for reaching out, ${name}!`,
-            text: `Hi ${name},\n\nThank you for contacting me! I have received your message and will get back to you as soon as possible.\n\nHere is a copy of your message:\n"${message}"\n\nBest regards,\nSaksham Makhija`
-        };
-
-        await Promise.all([
-          transporter.sendMail(mailOptions),
-          transporter.sendMail(autoReplyOptions)
-        ]);
-
-        console.log("Emails sent successfully for:", name);
-        return res.status(200).json({ 
-          success: true, 
-          message: 'Message sent successfully!' 
         });
 
-      } catch (emailError) {
-        console.error("SMTP Email Error:", emailError);
-        return res.status(500).json({ 
-          success: false, 
-          message: 'Message saved, but email service failed.',
-          error: emailError.message 
-        });
+        return res.status(200).json({ success: true, message: 'Message sent via SMTP!' });
+      } catch (smtpError) {
+        console.error("SMTP Final Error:", smtpError);
+        return res.status(500).json({ success: false, message: 'All email services failed.', error: smtpError.message });
       }
     } else {
-      console.warn("SMTP credentials missing.");
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Message received (Notification skipped)' 
-      });
+      return res.status(200).json({ success: true, message: 'Message saved to database (Email skipped).' });
     }
   } catch (error) {
-    console.error('Unexpected Error:', error);
+    console.error('Unexpected Global Error:', error);
     if (!res.headersSent) {
       res.status(500).json({ success: false, message: 'An unexpected error occurred.', error: error.message });
     }
