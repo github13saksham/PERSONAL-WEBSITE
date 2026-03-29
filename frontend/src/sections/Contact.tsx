@@ -54,6 +54,7 @@ const Contact = () => {
               type="text" 
               id="name" 
               required
+              autoComplete="name"
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-main focus:ring-1 focus:ring-primary-main transition-all"
@@ -66,6 +67,7 @@ const Contact = () => {
               type="email" 
               id="email" 
               required
+              autoComplete="email"
               value={formData.email}
               onChange={e => setFormData({ ...formData, email: e.target.value })}
               className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary-main focus:ring-1 focus:ring-primary-main transition-all"
