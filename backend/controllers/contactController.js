@@ -11,17 +11,25 @@ const submitContact = async (req, res) => {
       return res.status(400).json({ success: false, message: 'All fields are required.' });
     }
     
+    // Save to DB first
     await prisma.contact.create({
       data: { name, email, message }
     });
 
+    // Send response to user IMMEDIATELY so UI doesn't hang
+    res.status(200).json({ success: true, message: 'Message sent successfully!' });
+
+    // Handle email in the background
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
         const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
+          service: 'gmail',
+          auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS
+          },
+          connectionTimeout: 10000, // 10s timeout
+          greetingTimeout: 5000,
+          socketTimeout: 10000
         });
 
         const mailOptions = {
@@ -32,7 +40,6 @@ const submitContact = async (req, res) => {
             replyTo: email
         };
 
-        // Automated reply to the user
         const autoReplyOptions = {
             from: process.env.EMAIL_USER,
             to: email,
@@ -40,14 +47,15 @@ const submitContact = async (req, res) => {
             text: `Hi ${name},\n\nThank you for contacting me! I have received your message and will get back to you as soon as possible.\n\nHere is a copy of your message:\n"${message}"\n\nBest regards,\nSaksham Makhija`
         };
 
-        await transporter.sendMail(mailOptions);
-        await transporter.sendMail(autoReplyOptions);
+        // Fire and forget (with logging)
+        transporter.sendMail(mailOptions).catch(err => console.error("Admin Email Error:", err));
+        transporter.sendMail(autoReplyOptions).catch(err => console.error("User Auto-Reply Error:", err));
     }
-
-    res.status(200).json({ success: true, message: 'Message sent successfully!' });
   } catch (error) {
-    console.error('Contact error:', error);
-    res.status(500).json({ success: false, message: 'Failed to submit form.' });
+    console.error('Contact database error:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: 'Failed to submit form.' });
+    }
   }
 };
 
