@@ -11,24 +11,34 @@ const submitContact = async (req, res) => {
       return res.status(400).json({ success: false, message: 'All fields are required.' });
     }
     
-    // Save to DB first
-    await prisma.contact.create({
-      data: { name, email, message }
-    });
+    // 1. Attempt to Save to Database
+    try {
+      await prisma.contact.create({
+        data: { name, email, message }
+      });
+      console.log("Contact saved to database for:", name);
+    } catch (dbError) {
+      console.error('Database Error:', dbError);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Database error: Could not save your message.',
+        error: dbError.message 
+      });
+    }
 
-    // Handle email
+    // 2. Attempt to Send Email
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
       try {
         const transporter = nodemailer.createTransport({
           host: 'smtp.gmail.com',
-          port: 465,
-          secure: true, // use SSL
+          port: 587,
+          secure: false, // Use TLS (STARTTLS)
           auth: {
               user: process.env.EMAIL_USER,
               pass: process.env.EMAIL_PASS
           },
-          connectionTimeout: 15000, 
-          socketTimeout: 15000
+          connectionTimeout: 10000, 
+          socketTimeout: 10000
         });
 
         // Verify connection before sending
@@ -49,32 +59,36 @@ const submitContact = async (req, res) => {
             text: `Hi ${name},\n\nThank you for contacting me! I have received your message and will get back to you as soon as possible.\n\nHere is a copy of your message:\n"${message}"\n\nBest regards,\nSaksham Makhija`
         };
 
-        // Send both mails
         await Promise.all([
           transporter.sendMail(mailOptions),
           transporter.sendMail(autoReplyOptions)
         ]);
 
-        console.log("Emails sent successfully for contact request from:", name);
-        return res.status(200).json({ success: true, message: 'Message sent successfully!' });
+        console.log("Emails sent successfully for:", name);
+        return res.status(200).json({ 
+          success: true, 
+          message: 'Message sent successfully!' 
+        });
 
       } catch (emailError) {
-        console.error("Email Sending Error:", emailError);
-        // We still saved it to the DB, but email failed
+        console.error("SMTP Email Error:", emailError);
         return res.status(500).json({ 
           success: false, 
-          message: 'Message saved, but email notification failed. I will check it soon.',
+          message: 'Message saved, but email service failed.',
           error: emailError.message 
         });
       }
     } else {
-      console.warn("SMTP credentials missing, only saving to database.");
-      return res.status(200).json({ success: true, message: 'Message received (Email notification skipped)' });
+      console.warn("SMTP credentials missing.");
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Message received (Notification skipped)' 
+      });
     }
   } catch (error) {
-    console.error('Contact database error:', error);
+    console.error('Unexpected Error:', error);
     if (!res.headersSent) {
-      res.status(500).json({ success: false, message: 'Failed to submit form.' });
+      res.status(500).json({ success: false, message: 'An unexpected error occurred.', error: error.message });
     }
   }
 };
